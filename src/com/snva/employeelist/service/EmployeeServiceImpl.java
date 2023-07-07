@@ -53,7 +53,9 @@ public class EmployeeServiceImpl implements IEmployeeService
 	{
 		try
 		{
-			dbService.addNewEmployeeToDb(employee);
+			if(dbService.addNewEmployeeToDb(employee)){
+				System.out.println(employee.getFirstName() + " is inserted");;
+			};
 
 		}catch(UnsupportedOperationException e){
 			System.out.println(e.getMessage());
@@ -92,6 +94,7 @@ public class EmployeeServiceImpl implements IEmployeeService
 	 * @exception IndexOutOfBoundsException Thrown to indicate that an index of some sort
 	 * is out of range.
 	 */
+	// Not at all used and I don't knwo Why this is here
 	public void removeEmployeeByName(List<Employee> employeelist1)
 	{
 		int index1=0;

@@ -33,10 +33,14 @@ public class IEmployeeDBServiceImpl implements IEmployeeDBService{
 
     @Override
     public boolean addNewEmployeeToDb(Employee employee) {
-        String sqlStmt = "Insert into Product values(?,?,?,?,?,?,?,?,?)";
+        String sqlStmt = "Insert into Employee values(?,?,?,?,?,?,?,?)";
+
         try {
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT max(EmployeeId)+1 FROM testdb.employee");
+            rs.next();
             PreparedStatement preparedStatement = connection.prepareStatement(sqlStmt);
-            preparedStatement.setInt(1,employee.getEmployeeId());
+            preparedStatement.setInt(1,rs.getInt(1));
             preparedStatement.setString(2,employee.getFirstName());
             preparedStatement.setString(3,employee.getLastName());
             preparedStatement.setString(4,employee.getDesignation());
@@ -44,7 +48,7 @@ public class IEmployeeDBServiceImpl implements IEmployeeDBService{
             preparedStatement.setDouble(6,employee.getSalary());
             preparedStatement.setDate(7, new Date(employee.getDateOfBirth().getTime()));
             preparedStatement.setDate(8, new Date (employee.getDateOfJoining().getTime()));
-            int success = preparedStatement.executeUpdate(sqlStmt);
+            int success = preparedStatement.executeUpdate();
             if(success == 1){
                return true;
 
@@ -52,20 +56,26 @@ public class IEmployeeDBServiceImpl implements IEmployeeDBService{
             else {
                 return false;
             }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+        return false;
     }
 
     @Override
     public void removeEmployeeFromDB(String name) {
-        String sqlStmt = "Delete from Employee where name =?";
+        String sqlStmt = "Delete from Employee where Fname =?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sqlStmt);
             preparedStatement.setString(1,name);
-            preparedStatement.executeUpdate();
+            int result = preparedStatement.executeUpdate();
+            if(result ==1){
+                System.out.println("Employee " + name + " is deleted!!!");
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
     }
@@ -87,20 +97,22 @@ public class IEmployeeDBServiceImpl implements IEmployeeDBService{
                 employee.setDateOfJoining(rs.getDate(8));
 
                 employeeList.add(employee);
-                return employeeList;
+
             }
+            return employeeList;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+
         return null;
     }
 
     @Override
     public List<Employee> searchEmployeeByNameInDB(String name) {
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("Select * from Employee where Fname = ?");
+            PreparedStatement preparedStatement = connection.prepareStatement("Select * from Employee where Fname Like ?");
             List<Employee> employeeList = new ArrayList();
-            preparedStatement.setString(1,name);
+            preparedStatement.setString(1,'%'+name+'%');
             ResultSet rs  = preparedStatement.executeQuery();
             while (rs.next()){
                 Employee employee = new Employee(rs.getInt(1));
@@ -113,11 +125,13 @@ public class IEmployeeDBServiceImpl implements IEmployeeDBService{
                 employee.setDateOfJoining(rs.getDate(8));
 
                 employeeList.add(employee);
-                return employeeList;
+
             }
+            return employeeList;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+
         return null;
     }
 
@@ -138,11 +152,13 @@ public class IEmployeeDBServiceImpl implements IEmployeeDBService{
                 employee.setDateOfJoining(rs.getDate(8));
 
                 employeeList.add(employee);
-                return employeeList;
+
             }
+            return employeeList;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+
         return null;
     }
 }

@@ -61,7 +61,7 @@ public class EmployeeUIServiceImpl implements IEmployeeUIService
 			dbService.removeEmployeeFromDB(name);
 
 		} catch(NullPointerException e){
-			System.out.println("Emloyee not found with this name");
+			System.out.println("Employee not found with this name");
 		}
 	}
 	/**
@@ -100,8 +100,6 @@ public class EmployeeUIServiceImpl implements IEmployeeUIService
 	  * This function sorts the complete list according to first name. It uses the
 	  * another class which implements the comparator interface and
 	  * its function compareTo().
-	  * @exception EmployeeServiceException exception is thrown when user want to
-	  * see the employee detail and the list is empty.
 	  * @exception ClassCastException Thrown to indicate that the code has attempted
 	  * to cast an object to a subclass of which it is not an instance.
 	  * @exception UnsupportedOperationException Thrown to indicate that the requested
@@ -114,12 +112,10 @@ public class EmployeeUIServiceImpl implements IEmployeeUIService
 			List<Employee> employeelist=dbService.sortEmployeeInDB();
 			printList(employeelist);
 
-		 } catch(ClassCastException e){
-			System.out.println(e.getMessage());
-		 }catch(UnsupportedOperationException e){
+		 } catch(ClassCastException | UnsupportedOperationException e){
 			System.out.println(e.getMessage());
 		 }
-	 }
+	}
 
 	/**
 	 * This function prints the details of an Employee.
