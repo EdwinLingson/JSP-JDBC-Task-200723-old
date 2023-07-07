@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import com.snva.employeelist.DBService.IEmployeeDBService;
+import com.snva.employeelist.DBService.IEmployeeDBServiceImpl;
 import com.snva.employeelist.bean.Employee;
 import com.snva.employeelist.service.exception.EmployeeServiceException;
 import com.snva.employeelist.util.ReadUtil;
@@ -20,6 +22,7 @@ import com.snva.employeelist.util.ReadUtil;
 public class EmployeeServiceImpl implements IEmployeeService
 {
 	List<Employee> employeelist;
+	IEmployeeDBService dbService;
 
 	ReadUtil m_readUtil;
 	/**
@@ -31,6 +34,7 @@ public class EmployeeServiceImpl implements IEmployeeService
 		employeelist = new ArrayList<Employee>();
 
 		m_readUtil=new ReadUtil();
+		dbService = new IEmployeeDBServiceImpl();
 	}
 	/**
 	 * This function adds a new employee to the list. It calls the in-built
@@ -49,7 +53,7 @@ public class EmployeeServiceImpl implements IEmployeeService
 	{
 		try
 		{
-		    employeelist.add(employee);
+			dbService.addNewEmployeeToDb(employee);
 
 		}catch(UnsupportedOperationException e){
 			System.out.println(e.getMessage());
@@ -71,6 +75,7 @@ public class EmployeeServiceImpl implements IEmployeeService
 	 */
 	public List<Employee> showAllEmployeeInformation() throws EmployeeServiceException
 	{
+		List<Employee> employeeList = dbService.showAllEmployeeInDB();
 		if(employeelist.size()==0)
 		{
 			throw new EmployeeServiceException(EmployeeServiceException.NO_EMPLOYEE_FOUND);

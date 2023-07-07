@@ -2,6 +2,8 @@ package com.snva.employeelist.uiservice;
 
 import java.util.*;
 
+import com.snva.employeelist.DBService.IEmployeeDBService;
+import com.snva.employeelist.DBService.IEmployeeDBServiceImpl;
 import com.snva.employeelist.bean.Employee;
 import com.snva.employeelist.service.EmployeeServiceImpl;
 import com.snva.employeelist.service.IEmployeeService;
@@ -18,6 +20,7 @@ public class EmployeeUIServiceImpl implements IEmployeeUIService
 	private ReadUtil m_readUtil;
 
 	private IEmployeeService m_employeeService;
+	IEmployeeDBService dbService;
 
 	/**
 	 *This is the default constructor of the class which creates objects of
@@ -27,6 +30,7 @@ public class EmployeeUIServiceImpl implements IEmployeeUIService
 	{
 		m_readUtil= new ReadUtil();
 		m_employeeService=new EmployeeServiceImpl();
+		dbService = new IEmployeeDBServiceImpl();
 	}
 	/**
 	 *This function read an employee detail and add that employee to the list.
@@ -51,18 +55,12 @@ public class EmployeeUIServiceImpl implements IEmployeeUIService
 	 * want to see the employee detail and the list is empty.
 	 */
 	public void removeEmployee(){
-		List<Employee> employeelist1;
 
 		try{
-			List<Employee> employeelist=m_employeeService.showAllEmployeeInformation();
-			employeelist1=new ArrayList<Employee>();
 			String name = m_readUtil.readString("Enter Employee name(or any part of name) : ","String cannot be empty");
-			employeelist1=searchEmployeeByName(name);
-			m_employeeService.removeEmployeeByName(employeelist1);
+			dbService.removeEmployeeFromDB(name);
 
-		}catch(EmployeeServiceException e){
-			System.out.println(e.getMessage());
-		}catch(NullPointerException e){
+		} catch(NullPointerException e){
 			System.out.println("Emloyee not found with this name");
 		}
 	}
@@ -73,22 +71,15 @@ public class EmployeeUIServiceImpl implements IEmployeeUIService
 	 */
 	public void showAllEmployee()
 	{
-		try
-		{
-			List<Employee> employeelist=m_employeeService.showAllEmployeeInformation();
-			System.out.println("All Employees Information : \n ");
-			printList(employeelist);
+		List<Employee> employeelist=dbService.showAllEmployeeInDB();
+		System.out.println("All Employees Information : \n ");
+		printList(employeelist);
 
-		}catch(EmployeeServiceException e){
-			System.out.println(e.getMessage());
-		}
 	}
 	/**
 	 * This function search an employee in the list by its name.
 	 * @param Name. It can be first name,last name or full name of the employee
 	 * @return List. Returns the list of employee having the name from which search is initiated.
-	 * @exception EmployeeServiceException This exception is thrown when user
-	 * want to see the employee detail and the list is empty.
 	 * @exception StringIndexOutOfBoundException Thrown by String methods to
 	 * indicate that an index is either negative or greater than the size of the
 	 * string.
@@ -96,27 +87,14 @@ public class EmployeeUIServiceImpl implements IEmployeeUIService
 	 * attempts to use null in a case where an object is required.
 	 */
 	 public List<Employee> searchEmployeeByName(String name) throws NullPointerException {
-		List<Employee> employeelist1 = null;
-		try {
-			name = name.toLowerCase();
-			List<Employee> employeelist=m_employeeService.showAllEmployeeInformation();
-			employeelist1 = new ArrayList<Employee>();
-			Iterator<Employee> employeelistiterator= employeelist.iterator();
-			while(employeelistiterator.hasNext()) {
-				Employee employee=employeelistiterator.next();
-				String fullName = (employee.getFirstName()+" "+employee.getLastName()).toLowerCase();
-				if(fullName.contains(name))	{
-					employeelist1.add(employee);
-				}
-			}
-			printList(employeelist1);
-		}catch(EmployeeServiceException e){
-			System.out.println(e.getMessage());
-		}
-		if((employeelist1==null) || (employeelist1.size()==0))
+
+		 name = name.toLowerCase();
+		 List<Employee> employeeList = dbService.searchEmployeeByNameInDB(name);
+		 printList(employeeList);
+		 if((employeeList==null) || (employeeList.size()==0))
 			throw new NullPointerException();
 
-		return employeelist1;
+		return employeeList;
 	}
 	 /**
 	  * This function sorts the complete list according to first name. It uses the
@@ -131,24 +109,12 @@ public class EmployeeUIServiceImpl implements IEmployeeUIService
 	  */
 	public void sortEmployee()
 	{
-		List<Employee> employeelist1=null;
 		try
 		 {
-			List<Employee> employeelist=m_employeeService.showAllEmployeeInformation();
-			employeelist1.addAll(employeelist);
-
-			System.out.println(" Before Sorting ");
-			System.out.println("---------------------");
+			List<Employee> employeelist=dbService.sortEmployeeInDB();
 			printList(employeelist);
 
-			System.out.println(" After sorting ");
-			System.out.println("---------------------");
-			Collections.sort(employeelist1,new FirstNameCompare());
-			printList(employeelist1);
-
-		 }catch (EmployeeServiceException e){
-			System.out.println(e.getMessage());
-		 }catch(ClassCastException e){
+		 } catch(ClassCastException e){
 			System.out.println(e.getMessage());
 		 }catch(UnsupportedOperationException e){
 			System.out.println(e.getMessage());
@@ -182,16 +148,7 @@ public class EmployeeUIServiceImpl implements IEmployeeUIService
 		while(employeelistiterator.hasNext())
 		{
 			Employee employee=employeelistiterator.next();
-			System.out.println("---------------------------------------");
-			System.out.println("Employee ID : "+employee.getEmployeeId());
-			System.out.println("First Name : "+employee.getFirstName());
-			System.out.println("Last Name : "+employee.getLastName());
-			System.out.println("Designation : "+employee.getDesignation());
-			System.out.println("Contact Number : "+employee.getContactNumber());
-			System.out.println("Salary : "+employee.getSalary());
-			System.out.println("Date Of Birth : "+employee.getDateOfBirth());
-			System.out.println("Date Of Joining : "+employee.getDateOfJoining());
-			System.out.println("-----------------------------------------");
+			printInfo(employee);
 			System.out.println();
 		}
 	}

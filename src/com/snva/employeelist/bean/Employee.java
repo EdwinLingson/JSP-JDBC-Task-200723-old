@@ -22,6 +22,10 @@ public class Employee
 	{
 		m_employeeId=current_id++;
 	}
+	public Employee(int m_employeeId)
+	{
+		this.m_employeeId=m_employeeId;
+	}
 	public Double getContactNumber() {
 		return m_contactNumber;
 	}
