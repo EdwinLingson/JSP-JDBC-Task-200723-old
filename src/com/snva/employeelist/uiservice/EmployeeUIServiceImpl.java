@@ -144,6 +144,11 @@ public class EmployeeUIServiceImpl implements IEmployeeUIService
 	 */
 	private void printList(List<Employee> employeelist)
 	{
+		if(employeelist==null)
+		{
+			System.out.println("The List is Empty");
+			return;
+		}
 		Iterator<Employee> employeelistiterator=employeelist.iterator();
 		while(employeelistiterator.hasNext())
 		{
